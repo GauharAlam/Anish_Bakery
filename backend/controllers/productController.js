@@ -131,10 +131,12 @@ const deleteProduct = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Product not found' });
         }
 
-        // Delete image file
-        const imagePath = path.join(__dirname, '..', product.imageURL);
-        if (fs.existsSync(imagePath)) {
-            fs.unlinkSync(imagePath);
+        // Delete local image file only (skip external URLs)
+        if (product.imageURL && product.imageURL.startsWith('/uploads')) {
+            const imagePath = path.join(__dirname, '..', product.imageURL);
+            if (fs.existsSync(imagePath)) {
+                fs.unlinkSync(imagePath);
+            }
         }
 
         await Product.findByIdAndDelete(req.params.id);
